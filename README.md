@@ -6,7 +6,7 @@
 
 This repository houses a modular, object-oriented digital signal processing (DSP) block implemented in MATLAB. It acts as a complete hardware-equivalent frontend pipeline, integrating a signal generator, high-pass filter (HPF), anti-aliasing filter (AAF), time-varying automatic gain control (AGC), noise gate, analog-to-digital converter (ADC), and an ADC encoder. It explores two main areas:
 
-**1. Digital Signal Processing (DSP) Paradigms:** Sinusoidal signal generation, filtering, automatic gain control, sampling, quantization, and fixed-point representation.
+**1. Digital Signal Processing (DSP) Paradigms:** Sinusoidal signal generation, multi-stage filtering, automatic gain control, sampling, quantization, fixed-point representation, frame-based processing.
 
 **2. Software Engineering Paradigms:** Object-oriented programming (OOP), unit testing, integration testing, code reusability, and modularity.
 
