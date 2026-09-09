@@ -15,10 +15,14 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      # Installs MATLAB along with your required Signal Processing Toolbox
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
+        with:
+          products: |
+            MATLAB
+            Signal_Processing_Toolbox
 
-      # Runs your test runner file directly from the repository root
       - name: Run test runner script
         uses: matlab-actions/run-command@v2
         with:
