@@ -18,8 +18,8 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
 
-      # Navigates into your project subdirectory and runs your test runner
+      # Runs your test runner file directly from the repository root
       - name: Run test runner script
         uses: matlab-actions/run-command@v2
         with:
-          command: cd('ADC Signal Chain'); run('ADCRunTests.m')
+          command: run('ADCRunTests.m')
