@@ -1,5 +1,7 @@
 # Automatic-Gain-Control-Analog-to-Digital-Converter
 
+[![MATLAB Automated Testing](https://github.com/DamiProject/Automatic-Gain-Control-Analog-to-Digital-Converter/actions/workflows/matlab-ci.yml/badge.svg)](https://github.com/DamiProject/Automatic-Gain-Control-Analog-to-Digital-Converter/actions/workflows/matlab-ci.yml)
+
 **Status: Under Active Development**
 
 ## Overview
