@@ -12,7 +12,7 @@ This repository houses a modular, object-oriented digital signal processing (DSP
 
 **2. Software Engineering Paradigms:** Object-oriented programming (OOP), unit testing, integration testing, code reusability, and modularity.
 
-## Prerequisites & Dependencies
+### Prerequisites & Dependencies
 
 This block requires MATLAB and the standard toolboxes used for digital signal processing and filter design:
 
