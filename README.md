@@ -79,3 +79,11 @@ This block requires MATLAB and the standard toolboxes used for digital signal pr
 **- Bit-Accurate Binary Display:** It includes a Binary method that extracts the exact string representation of the logical bits (e.g., returning "1011" for a 4-bit ADC), ignoring any extra padded zeros that MATLAB adds when storing odd bit-widths inside standard 8, 16, 32, or 64-bit memory blocks.
 
 **- Downstream Formatting:** The encoder outputs an input format structure that defines the Word Length (WL), Integer Word Length (IWL), and Fractional Word Length (FWL = 0), passing crucial fixed-point metadata to the next stage of processing.
+
+---
+
+## Author
+
+**Damilola Ibukun Awotunde**
+
+MEng, Communications & Signal Processing - Western University | [LinkedIn](https://www.linkedin.com/in/damilola-awotunde) 
