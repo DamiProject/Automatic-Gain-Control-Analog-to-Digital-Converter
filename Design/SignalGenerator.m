@@ -105,7 +105,7 @@ classdef SignalGenerator < handle
 
             An = obj.ADCParameters.getValue("An");
             Fnoise = obj.ADCParameters.getValue("Fnoise");
-            NoiseSignal = An * sin(2 * pi * Fnoise * t);
+            InterferenceSignal = An * sin(2 * pi * Fnoise * t);
 
             Anf = obj.ADCParameters.getValue("Anf");
             NoiseFloor = Anf * randn(size(t));
@@ -113,11 +113,11 @@ classdef SignalGenerator < handle
             DCValue = obj.ADCParameters.getValue("DC");
             DC = DCValue * ones(size(t));
 
-            Inp_Sig = DC + DataSignal + NoiseSignal + NoiseFloor;
+            Inp_Sig = DC + DataSignal + InterferenceSignal + NoiseFloor;
 
             Components.Envelope = Envelope;
             Components.DataSignal = DataSignal;
-            Components.NoiseSignal = NoiseSignal;
+            Components.InterferenceSignal = InterferenceSignal;
             Components.NoiseFloor = NoiseFloor;
             Components.DC = DC;
 
@@ -135,6 +135,38 @@ classdef SignalGenerator < handle
             FrameInfo.IsLastFrame = ...
                 obj.NextSampleIndex >= TotalSamples;
             FrameInfo.TotalSamples = TotalSamples;
+        end
+
+        function [Inp_Sig, t, Components, FrameInfo] = ...
+                GenNoisyTwoDataSignals(obj)
+            %% ===================================================
+            %% GENERATE A FRAME CONTAINING TWO DATA-SIGNAL TONES
+            %% ===================================================
+            % Generate the original composite-signal frame first so the
+            % frame position, time axis, noise, DC offset, burst, and fade
+            % remain identical to GenNoisySignal.
+            [Inp_Sig, t, Components, FrameInfo] = ...
+                obj.GenNoisySignal();
+
+            % Preserve the original nonstationary data signal as the first
+            % tone and generate a second tone with an independent constant
+            % amplitude and frequency.
+            DataSignal1 = Components.DataSignal;
+
+            FData2 = obj.ADCParameters.getValue("FData2");
+            Ad2 = obj.ADCParameters.getValue("Ad2");
+            DataSignal2 = ...
+                Ad2 * sin(2 * pi * FData2 * t);
+
+            % The complete data signal is the sum of both tones. Retain the
+            % individual components so their FFT peaks can be inspected
+            % independently as well as in the combined waveform.
+            Components.DataSignal1 = DataSignal1;
+            Components.DataSignal2 = DataSignal2;
+            Components.DataSignal = ...
+                DataSignal1 + DataSignal2;
+
+            Inp_Sig = Inp_Sig + DataSignal2;
         end
 
         function Reset(obj)
@@ -217,7 +249,7 @@ classdef SignalGenerator < handle
 
             Components.Envelope = EmptyColumn;
             Components.DataSignal = EmptyColumn;
-            Components.NoiseSignal = EmptyColumn;
+            Components.InterferenceSignal = EmptyColumn;
             Components.NoiseFloor = EmptyColumn;
             Components.DC = EmptyColumn;
 

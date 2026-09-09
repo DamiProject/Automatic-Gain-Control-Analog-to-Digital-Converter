@@ -31,8 +31,6 @@ classdef AGC < handle
         % Minimum denominator for lower-limit gain calculation
         SafetyFloorLow
 
-        MinGain = 0.1; %% Minimum allowed AGC gain
-        MaxGain = 10.0; %%  Maximum allowed AGC gain
     end
 
     methods
@@ -41,6 +39,7 @@ classdef AGC < handle
             %% AGC INSTANCE CONSTRUCTOR
             %% =========================
             obj.ADCParameters = P;
+            obj.Gain = obj.GetConfiguredInitialGain();
         end
         
         function [OutputAGCSignal, t, History] = ...
@@ -126,17 +125,33 @@ classdef AGC < handle
             GatePeak = obj.GatePeak;
             % Close Noise Gate Target
             GateFloor = obj.GateFloor;
-            % Minimum Allowed AGC Gain Bound
-            MinGain = obj.MinGain;
-            % Maximum Allowed AGC Gain Bound
-            MaxGain = obj.MaxGain;
+            % Configuration-defined AGC gain bounds. Keeping these values
+            % outside the AGC implementation allows each design to select
+            % the gain range required by its input dynamic range and ADC
+            % full-scale specification.
+            MinGain = ...
+                obj.ADCParameters.getValue("MinAGCGain");
+            MaxGain = ...
+                obj.ADCParameters.getValue("MaxAGCGain");
+
+            if MinGain > MaxGain
+                error('AGC:InvalidGainRange', ...
+                    ['MinAGCGain must be less than or equal to ', ...
+                     'MaxAGCGain.']);
+            end
 
             %% Derive AGC Limits and Thresholds From Parameters
 
-            % Noise floor Amplitude
-            Anf = obj.ADCParameters.getValue("Anf");
-            % Envelope threshold calculation used to detect noise/silence
-            NoiseThreshold = abs(Anf) * 2;
+            % Use a design-specific threshold when one is configured. The
+            % NaN fallback preserves the original two-times-noise-amplitude
+            % behavior for existing test and legacy configurations.
+            NoiseThreshold = ...
+                obj.ADCParameters.getValue("NoiseGateThreshold");
+
+            if isnan(NoiseThreshold)
+                Anf = obj.ADCParameters.getValue("Anf");
+                NoiseThreshold = abs(Anf) * 2;
+            end
 
             % Quantizer full-scale Amplitude Parameter
             Vfs = obj.ADCParameters.getValue("Vfs");
@@ -354,13 +369,40 @@ classdef AGC < handle
             %% ==========================
             % Initial Value of the Envelope/Level Detector
             obj.Envelope = 0.0;
-            % Initial AGC Gain
-            obj.Gain = 1.0;
+            % Restore the configuration-defined safe startup gain.
+            obj.Gain = obj.GetConfiguredInitialGain();
             % Initial Noise Gate Gain
             obj.GateGain = 1.0;
             % First global sample index and completed-frame count
             obj.SamplesProcessed = 0;
             obj.FramesProcessed = 0;
+        end
+    end
+
+    methods (Access = private)
+        function InitialGain = GetConfiguredInitialGain(obj)
+            %% =============================================
+            %% VALIDATE AND RETURN CONFIGURED INITIAL GAIN
+            %% =============================================
+
+            MinGain = ...
+                obj.ADCParameters.getValue("MinAGCGain");
+            MaxGain = ...
+                obj.ADCParameters.getValue("MaxAGCGain");
+            InitialGain = ...
+                obj.ADCParameters.getValue("InitialAGCGain");
+
+            if MinGain > MaxGain
+                error('AGC:InvalidGainRange', ...
+                    ['MinAGCGain must be less than or equal to ', ...
+                     'MaxAGCGain.']);
+            end
+
+            if InitialGain < MinGain || InitialGain > MaxGain
+                error('AGC:InvalidInitialGain', ...
+                    ['InitialAGCGain must lie between MinAGCGain ', ...
+                     'and MaxAGCGain.']);
+            end
         end
     end
 

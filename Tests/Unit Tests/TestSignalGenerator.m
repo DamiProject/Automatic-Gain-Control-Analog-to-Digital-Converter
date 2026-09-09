@@ -131,11 +131,56 @@ classdef TestSignalGenerator < matlab.unittest.TestCase
                 ActualComponents.DataSignal, ...
                 ExpectedComponents.DataSignal, "AbsTol", 1e-12);
             testCase.verifyEqual( ...
-                ActualComponents.NoiseSignal, ...
+                ActualComponents.InterferenceSignal, ...
                 ExpectedComponents.NoiseSignal, "AbsTol", 1e-12);
             testCase.verifyEqual( ...
                 ActualComponents.DC, ...
                 ExpectedComponents.DC, "AbsTol", 1e-12);
+        end
+
+        function testTwoDataSignalMethodAddsSecondTone(testCase)
+            %% Validates the second tone and preserves one-frame advancement.
+            P = testCase.createDefaultParameters();
+            P.setValue("Anf", 0);
+
+            SingleGenerator = SignalGenerator(P);
+            TwoSignalGenerator = SignalGenerator(P);
+
+            [SingleSignal, SingleTime, SingleComponents, SingleInfo] = ...
+                SingleGenerator.GenNoisySignal();
+
+            [TwoSignal, TwoTime, TwoComponents, TwoInfo] = ...
+                TwoSignalGenerator.GenNoisyTwoDataSignals();
+
+            ExpectedSecondSignal = ...
+                P.getValue("Ad2") * sin( ...
+                2 * pi * P.getValue("FData2") * TwoTime);
+
+            testCase.verifyEqual( ...
+                TwoTime, SingleTime, "AbsTol", 1e-12);
+            testCase.verifyEqual( ...
+                TwoInfo.SampleIndex, SingleInfo.SampleIndex);
+
+            testCase.verifyEqual( ...
+                TwoComponents.DataSignal1, ...
+                SingleComponents.DataSignal, "AbsTol", 1e-12);
+            testCase.verifyEqual( ...
+                TwoComponents.DataSignal2, ...
+                ExpectedSecondSignal, "AbsTol", 1e-12);
+            testCase.verifyEqual( ...
+                TwoComponents.DataSignal, ...
+                SingleComponents.DataSignal + ExpectedSecondSignal, ...
+                "AbsTol", 1e-12);
+
+            testCase.verifyEqual( ...
+                TwoSignal, SingleSignal + ExpectedSecondSignal, ...
+                "AbsTol", 1e-12);
+
+            testCase.verifyEqual( ...
+                TwoSignalGenerator.NextSampleIndex, ...
+                P.getValue("FrameLength"));
+            testCase.verifyEqual( ...
+                TwoSignalGenerator.FramesGenerated, 1);
         end
 
         function testAWGNSequenceContinuesAcrossFrames(testCase)
@@ -249,9 +294,11 @@ classdef TestSignalGenerator < matlab.unittest.TestCase
             P.setValue("mu", 0.006);      % Gaussian burst peak location
             P.setValue("Sigma", 0.002);   % Gaussian burst width
             P.setValue("Ad", 1.0);        % Base envelope amplitude
+            P.setValue("Ad2", 0.4);       % Second data-signal amplitude
             P.setValue("Lambda", 30);     % Decay constant
             P.setValue("EST", 0.012);     % Exponential fade start time
             P.setValue("FData", 50);      % Data frequency, Hz
+            P.setValue("FData2", 120);    % Second data frequency, Hz
             P.setValue("An", 0.1);        % Out-of-band noise amplitude
             P.setValue("Fnoise", 300);    % Out-of-band noise frequency, Hz
             P.setValue("Anf", 0);         % AWGN floor amplitude
@@ -266,7 +313,7 @@ classdef TestSignalGenerator < matlab.unittest.TestCase
 
             Components.Envelope = zeros(0, 1);
             Components.DataSignal = zeros(0, 1);
-            Components.NoiseSignal = zeros(0, 1);
+            Components.InterferenceSignal = zeros(0, 1);
             Components.NoiseFloor = zeros(0, 1);
             Components.DC = zeros(0, 1);
 
@@ -283,8 +330,8 @@ classdef TestSignalGenerator < matlab.unittest.TestCase
                     ComponentFrame.Envelope]; 
                 Components.DataSignal = [Components.DataSignal; ...
                     ComponentFrame.DataSignal]; 
-                Components.NoiseSignal = [Components.NoiseSignal; ...
-                    ComponentFrame.NoiseSignal]; 
+                Components.InterferenceSignal = [Components.InterferenceSignal; ...
+                    ComponentFrame.InterferenceSignal]; 
                 Components.NoiseFloor = [Components.NoiseFloor; ...
                     ComponentFrame.NoiseFloor]; 
                 Components.DC = [Components.DC; ...
@@ -332,16 +379,16 @@ classdef TestSignalGenerator < matlab.unittest.TestCase
 
             An = P.getValue("An");
             Fnoise = P.getValue("Fnoise");
-            NoiseSignal = An * sin(2 * pi * Fnoise * t);
+            InterferenceSignal = An * sin(2 * pi * Fnoise * t);
 
             DC = P.getValue("DC") * ones(size(t));
 
             ExpectedSignal = ...
-                DC + DataSignal + NoiseSignal + NoiseFloor;
+                DC + DataSignal + InterferenceSignal + NoiseFloor;
 
             Components.Envelope = Envelope;
             Components.DataSignal = DataSignal;
-            Components.NoiseSignal = NoiseSignal;
+            Components.NoiseSignal = InterferenceSignal;
             Components.NoiseFloor = NoiseFloor;
             Components.DC = DC;
         end
