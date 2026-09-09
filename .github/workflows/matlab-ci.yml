@@ -1,0 +1,28 @@
+name: MATLAB Automated Testing
+
+# This runs your tests automatically on every push or pull request to main
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  execute-runner:
+    name: Run Custom MATLAB Runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Downloads your repository code onto the runner machine
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      # Step 2: Configures the official MATLAB environment
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+
+      # Step 3: Automatically runs your script
+      - name: Run test runner script
+        uses: matlab-actions/run-command@v2
+        with:
+          command: run('ADCRunTests.m')
