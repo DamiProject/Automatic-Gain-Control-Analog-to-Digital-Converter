@@ -67,14 +67,18 @@ classdef ADCEncoder
                 TwosComplement = reshape( ...
                     TwosComplement, OriginalSize);
 
-                %% ------------------------------------------
-                %% ADC INTEGER CODE FORMAT
-                %% ------------------------------------------
-
-                InputFormat.WL  = NumBits;
-                InputFormat.IWL = NumBits;
-                InputFormat.FWL = 0;
             end
+
+            %% ------------------------------------------
+            %% ADC INTEGER CODE FORMAT
+            %% ------------------------------------------
+            % Both representations are integer code streams. Return the
+            % format for every supported ADC width so the downstream
+            % fixed-point decimator receives explicit scaling metadata.
+
+            InputFormat.WL  = NumBits;
+            InputFormat.IWL = NumBits;
+            InputFormat.FWL = 0;
         end
 
         function [OffsetBits, TwosBits] = Binary(obj, ...
