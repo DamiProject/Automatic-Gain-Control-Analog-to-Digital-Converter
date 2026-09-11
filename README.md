@@ -1,7 +1,16 @@
 # Automatic-Gain-Control-Analog-to-Digital-Converter
 
-
 **Status: Under Active Development**
+
+---
+
+## Author
+
+**Damilola Ibukun Awotunde**
+
+MEng, Communications & Signal Processing - Western University | [LinkedIn](https://www.linkedin.com/in/damilola-awotunde) 
+
+---
 
 ## Overview
 
@@ -122,10 +131,3 @@ A successful run completes all tests without an assertion failure.
 
 **- Downstream Formatting:** The encoder outputs an input format structure that defines the Word Length (WL), Integer Word Length (IWL), and Fractional Word Length (FWL = 0), passing crucial fixed-point metadata to the next stage of processing.
 
----
-
-## Author
-
-**Damilola Ibukun Awotunde**
-
-MEng, Communications & Signal Processing - Western University | [LinkedIn](https://www.linkedin.com/in/damilola-awotunde) 
