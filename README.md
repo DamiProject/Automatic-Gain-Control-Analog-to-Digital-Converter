@@ -11,15 +11,58 @@ This repository houses a modular, object-oriented digital signal processing (DSP
 
 **2. Software Engineering Paradigms:** Object-oriented programming (OOP), unit testing, integration testing, code reusability, and modularity.
 
-### Prerequisites & Dependencies
+## How to Run
 
-This block requires MATLAB and the standard toolboxes used for digital signal processing and filter design:
+This repository contains the reusable implementation and verification codebase. The primary standalone execution path is the automated test suite.
 
-* **MATLAB** (Recommended: R2023a or newer)
-  
-* **Signal Processing Toolbox** (Required for Butterworth filter coefficient generation using `butter` and `sos2tf`)
+### Requirements
+
+- MATLAB
+- Signal Processing Toolbox
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/DamiProject/Automatic-Gain-Control-Analog-to-Digital-Converter.git
+cd Automatic-Gain-Control-Analog-to-Digital-Converter
+```
+
+### 2. Run the Test Suite
+
+Open MATLAB and navigate to the repository root, then run:
+
+```matlab
+ADCRunTests
+```
+
+`ADCRunTests.m` automatically adds the `Design` directory and its subdirectories to the MATLAB path, then executes all unit and integration tests contained in the `Tests` directory.
+
+The test suite verifies the individual ADC signal-chain modules as well as their interaction across the processing chain.
+
+The repository structure is:
+
+```text
+Automatic-Gain-Control-Analog-to-Digital-Converter/
+├── Design/
+│   ├── SignalGenerator.m
+│   ├── ADCFilter.m
+│   ├── AGC.m
+│   ├── ADC.m
+│   ├── ADCEncoder.m
+│   ├── ADCParameters.m
+│   └── ADCMeta.m
+│
+├── Tests/
+│   ├── Unit Tests/
+│   └── Integration Tests/
+│
+└── ADCRunTests.m
+```
+
+A successful run completes all tests without an assertion failure.
 
 ---
+
 ## Module Implementations
 
  **1. Signal Generator Object:** This module generates an instance of the analog input signal to be digitized, consisting of a sinusoidal baseband signal (core data), high-frequency interference signal, DC offset, and AWGN noise floor.
